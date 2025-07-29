@@ -1,18 +1,16 @@
+"use client"
+
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 
-interface LayoutProps {
-  children: React.ReactNode
-}
-
-export default function Layout({ children }: LayoutProps) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className="flex-1 p-6">
+      <main>
         <SidebarTrigger />
         {children}
       </main>
     </SidebarProvider>
   )
-}
+} 
