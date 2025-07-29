@@ -1,20 +1,20 @@
-import './App.css'
+import Layout from "@/components/layout"
+import { Button } from "@/components/ui/button"
 
 function App() {
   return (
-    <div className="min-h-screen bg-blue-500 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Job Tracker App
-        </h1>
-        <p className="text-gray-600">
-          If you can see this styled properly, Tailwind is working!
-        </p>
-        <button className="mt-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition-colors">
-          Test Button
-        </button>
+    <Layout>
+      <div className="mt-6">
+        <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold mb-4">Welcome to your Job Tracker</h2>
+          <p className="text-slate-600 mb-4">
+            Track your job applications, interviews, and progress all in one place.
+          </p>
+          <Button>Add Your First Job</Button>
+        </div>
       </div>
-    </div>
+    </Layout>
   )
 }
 
