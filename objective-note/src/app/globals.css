@@ -129,8 +129,5 @@
     @apply w-full flex-1;
   }
   
-  /* Debug: Add border to see layout */
-  [data-slot="sidebar-inset"] {
-    border: 1px solid red;
-  }
+
 }

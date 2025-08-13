@@ -8,6 +8,7 @@ import { Job, JobStatus } from "@/types/job"
 
 interface JobCardProps {
   job: Job
+  onDelete?: () => void
 }
 
 const statusConfig: Record<JobStatus, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
@@ -18,7 +19,7 @@ const statusConfig: Record<JobStatus, { label: string; variant: "default" | "sec
   ghosted: { label: "Ghosted", variant: "destructive" },
 }
 
-export function JobCard({ job }: JobCardProps) {
+export function JobCard({ job, onDelete }: JobCardProps) {
   const status = statusConfig[job.status]
   const formattedDate = new Date(job.createdAt).toLocaleDateString()
 
@@ -75,7 +76,12 @@ export function JobCard({ job }: JobCardProps) {
               <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-muted">
                 <Edit className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                onClick={onDelete}
+              >
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
