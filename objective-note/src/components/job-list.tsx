@@ -5,17 +5,49 @@ import { Plus, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { JobCard } from "@/components/job-card"
 import { AddJobDialog } from "@/components/add-job-dialog"
+import { EditJobDialog } from "@/components/edit-job-dialog"
+import { ViewJobDialog } from "@/components/view-job-dialog"
 import { useJobStorage } from "@/hooks/use-job-storage"
 import { Job } from "@/types/job"
 
 export function JobList() {
-  const { jobs, isLoading, error, addJob, deleteJob, refresh } = useJobStorage()
+  const { jobs, isLoading, error, addJob, updateJob, deleteJob, refresh } = useJobStorage()
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
+  const [editingJob, setEditingJob] = useState<Job | null>(null)
+  const [viewingJob, setViewingJob] = useState<Job | null>(null)
 
   const handleAddJob = async (newJob: Job) => {
     const success = await addJob(newJob)
     if (success) {
       setIsAddDialogOpen(false)
+    }
+  }
+
+  const handleEditJob = (job: Job) => {
+    setEditingJob(job)
+    setIsEditDialogOpen(true)
+  }
+
+  const handleViewJob = (job: Job) => {
+    setViewingJob(job)
+    setIsViewDialogOpen(true)
+  }
+
+  const handleUpdateJob = async (jobId: string, updates: Partial<Job>) => {
+    const success = await updateJob(jobId, updates)
+    if (success) {
+      setIsEditDialogOpen(false)
+      setEditingJob(null)
+    }
+  }
+
+  const handleDeleteJob = async (jobId: string) => {
+    const success = await deleteJob(jobId)
+    if (success) {
+      setIsViewDialogOpen(false)
+      setViewingJob(null)
     }
   }
 
@@ -69,7 +101,13 @@ export function JobList() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {jobs.map((job) => (
-            <JobCard key={job.id} job={job} onDelete={() => deleteJob(job.id)} />
+            <JobCard 
+              key={job.id} 
+              job={job} 
+              onDelete={() => deleteJob(job.id)}
+              onEdit={() => handleEditJob(job)}
+              onClick={() => handleViewJob(job)}
+            />
           ))}
         </div>
       )}
@@ -78,6 +116,31 @@ export function JobList() {
         open={isAddDialogOpen} 
         onOpenChange={setIsAddDialogOpen}
         onAddJob={handleAddJob}
+      />
+      
+      <EditJobDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        onUpdateJob={handleUpdateJob}
+        job={editingJob}
+      />
+      
+      <ViewJobDialog
+        open={isViewDialogOpen}
+        onOpenChange={setIsViewDialogOpen}
+        job={viewingJob}
+        onEdit={() => {
+          setIsViewDialogOpen(false)
+          if (viewingJob) {
+            setEditingJob(viewingJob)
+            setIsEditDialogOpen(true)
+          }
+        }}
+        onDelete={() => {
+          if (viewingJob) {
+            handleDeleteJob(viewingJob.id)
+          }
+        }}
       />
     </div>
   )

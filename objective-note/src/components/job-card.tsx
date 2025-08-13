@@ -9,6 +9,8 @@ import { Job, JobStatus } from "@/types/job"
 interface JobCardProps {
   job: Job
   onDelete?: () => void
+  onEdit?: () => void
+  onClick?: () => void
 }
 
 const statusConfig: Record<JobStatus, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
@@ -19,14 +21,17 @@ const statusConfig: Record<JobStatus, { label: string; variant: "default" | "sec
   ghosted: { label: "Ghosted", variant: "destructive" },
 }
 
-export function JobCard({ job, onDelete }: JobCardProps) {
+export function JobCard({ job, onDelete, onEdit, onClick }: JobCardProps) {
   const status = statusConfig[job.status]
   const formattedDate = new Date(job.createdAt).toLocaleDateString()
 
   return (
-    <Card className="group transition-all duration-300 hover:shadow-lg hover:scale-[1.02] border-border/50 hover:border-border">
+    <Card 
+      className="group transition-all duration-300 hover:shadow-lg hover:scale-[1.02] border-border/50 hover:border-border cursor-pointer"
+      onClick={onClick}
+    >
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             <CardTitle className="text-lg font-semibold truncate group-hover:text-primary transition-colors">
               {job.title}
@@ -37,8 +42,8 @@ export function JobCard({ job, onDelete }: JobCardProps) {
               </p>
             )}
           </div>
-          <div className="flex items-center gap-2 ml-4">
-            <Badge variant={status.variant} className="transition-all duration-200">
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <Badge variant={status.variant} className="transition-all duration-200 text-xs !text-xs px-2 py-0.5">
               {status.label}
             </Badge>
           </div>
@@ -63,8 +68,10 @@ export function JobCard({ job, onDelete }: JobCardProps) {
           
           {job.notes && (
             <div className="text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg border border-border/50">
-              <p className="font-medium mb-1 text-foreground">Notes:</p>
-              <p className="whitespace-pre-wrap">{job.notes}</p>
+              <p className="font-medium text-foreground mb-1">Notes:</p>
+              <p className="whitespace-pre-wrap line-clamp-3 text-xs">
+                {job.notes}
+              </p>
             </div>
           )}
           
@@ -73,14 +80,25 @@ export function JobCard({ job, onDelete }: JobCardProps) {
               Added {formattedDate}
             </span>
             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-muted">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-8 w-8 p-0 hover:bg-muted"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onEdit?.()
+                }}
+              >
                 <Edit className="h-4 w-4" />
               </Button>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                onClick={onDelete}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDelete?.()
+                }}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
