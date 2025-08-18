@@ -87,12 +87,12 @@ export function JobList() {
       </div>
 
       {isLoading ? (
-        <div className="text-center py-16">
+        <div className="text-center py-16 animate-in fade-in duration-500">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Loading your jobs...</p>
         </div>
       ) : jobs.length === 0 ? (
-        <div className="text-center py-16">
+        <div className="text-center py-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <h3 className="text-lg font-medium mb-2">No jobs yet</h3>
           <p className="text-muted-foreground">
             Start tracking your job applications by adding your first job.
@@ -100,13 +100,14 @@ export function JobList() {
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {jobs.map((job) => (
+          {jobs.map((job, index) => (
             <JobCard 
               key={job.id} 
               job={job} 
               onDelete={() => deleteJob(job.id)}
               onEdit={() => handleEditJob(job)}
               onClick={() => handleViewJob(job)}
+              animationDelay={index * 100}
             />
           ))}
         </div>

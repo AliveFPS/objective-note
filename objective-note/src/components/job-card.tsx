@@ -11,6 +11,7 @@ interface JobCardProps {
   onDelete?: () => void
   onEdit?: () => void
   onClick?: () => void
+  animationDelay?: number
 }
 
 const statusConfig: Record<JobStatus, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
@@ -21,13 +22,18 @@ const statusConfig: Record<JobStatus, { label: string; variant: "default" | "sec
   ghosted: { label: "Ghosted", variant: "destructive" },
 }
 
-export function JobCard({ job, onDelete, onEdit, onClick }: JobCardProps) {
+export function JobCard({ job, onDelete, onEdit, onClick, animationDelay = 0 }: JobCardProps) {
   const status = statusConfig[job.status]
   const formattedDate = new Date(job.createdAt).toLocaleDateString()
 
   return (
     <Card 
-      className="group transition-all duration-300 hover:shadow-lg hover:scale-[1.02] border-border/50 hover:border-border cursor-pointer"
+      className="group transition-all duration-300 hover:shadow-lg hover:scale-[1.02] border-border/50 hover:border-border cursor-pointer animate-in fade-in slide-in-from-bottom-4"
+      style={{ 
+        animationDelay: `${animationDelay}ms`,
+        animationDuration: '600ms',
+        animationFillMode: 'both'
+      }}
       onClick={onClick}
     >
       <CardHeader className="pb-3">
