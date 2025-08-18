@@ -1,5 +1,6 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const isDev = process.env.NODE_ENV === 'development';
 
 function createWindow() {
@@ -12,6 +13,7 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       enableRemoteModule: false,
+      preload: path.join(__dirname, 'preload.js'),
     },
     icon: path.join(__dirname, 'public/icon.png'), // You can add an icon later
     titleBarStyle: 'default',
@@ -65,4 +67,30 @@ app.on('web-contents-created', (event, contents) => {
   contents.on('new-window', (event, navigationUrl) => {
     event.preventDefault();
   });
+});
+
+// IPC handlers for job data persistence
+ipcMain.handle('get-jobs', async () => {
+  try {
+    const dataPath = path.join(app.getPath('userData'), 'jobs.json');
+    if (fs.existsSync(dataPath)) {
+      const data = fs.readFileSync(dataPath, 'utf8');
+      return JSON.parse(data);
+    }
+    return [];
+  } catch (error) {
+    console.error('Error reading jobs:', error);
+    return [];
+  }
+});
+
+ipcMain.handle('save-jobs', async (event, jobs) => {
+  try {
+    const dataPath = path.join(app.getPath('userData'), 'jobs.json');
+    fs.writeFileSync(dataPath, JSON.stringify(jobs, null, 2));
+    return { success: true };
+  } catch (error) {
+    console.error('Error saving jobs:', error);
+    return { success: false, error: error.message };
+  }
 }); 
