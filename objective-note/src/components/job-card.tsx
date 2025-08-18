@@ -31,18 +31,16 @@ export function JobCard({ job, onDelete, onEdit, onClick }: JobCardProps) {
       onClick={onClick}
     >
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg font-semibold truncate group-hover:text-primary transition-colors">
-              {job.title}
-            </CardTitle>
-            {job.description && (
-              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                {job.description}
-              </p>
-            )}
-          </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="space-y-2">
+          <CardTitle className="text-lg font-semibold truncate group-hover:text-primary transition-colors">
+            {job.title}
+          </CardTitle>
+          {job.description && (
+            <p className="text-sm text-muted-foreground line-clamp-2">
+              {job.description}
+            </p>
+          )}
+          <div className="flex items-center gap-2">
             <Badge variant={status.variant} className="transition-all duration-200 text-xs !text-xs px-2 py-0.5">
               {status.label}
             </Badge>

@@ -38,11 +38,11 @@ export function ViewJobDialog({ open, onOpenChange, job, onEdit, onDelete }: Vie
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[900px] max-h-[80vh] overflow-y-auto">
-        <DialogHeader className="pb-6">
-          <div className="flex items-start justify-between gap-6">
+        <DialogHeader className="pb-8 pt-2">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex-1 min-w-0">
               <DialogTitle className="text-2xl font-bold mb-2 truncate">{job.title}</DialogTitle>
-              <DialogDescription className="flex items-center gap-4 text-sm">
+              <DialogDescription className="flex flex-wrap items-center gap-4 text-sm">
                 <span>Added {formattedCreatedDate}</span>
                 {formattedCreatedDate !== formattedUpdatedDate && (
                   <span>Updated {formattedUpdatedDate}</span>
@@ -58,10 +58,9 @@ export function ViewJobDialog({ open, onOpenChange, job, onEdit, onDelete }: Vie
                   variant="outline"
                   size="sm"
                   onClick={onEdit}
-                  className="px-3"
+                  className="px-2"
                 >
-                  <Edit className="mr-1 h-4 w-4" />
-                  Edit
+                  <Edit className="h-4 w-4" />
                 </Button>
               )}
               {onDelete && (
@@ -69,10 +68,9 @@ export function ViewJobDialog({ open, onOpenChange, job, onEdit, onDelete }: Vie
                   variant="outline"
                   size="sm"
                   onClick={onDelete}
-                  className="text-destructive hover:text-destructive px-3"
+                  className="text-destructive hover:text-destructive px-2"
                 >
-                  <Trash2 className="mr-1 h-4 w-4" />
-                  Delete
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               )}
             </div>
@@ -83,11 +81,11 @@ export function ViewJobDialog({ open, onOpenChange, job, onEdit, onDelete }: Vie
           {/* Dynamic layout based on available content */}
           {job.description && job.url && job.notes ? (
             // All three exist - use 2-column layout
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 lg:grid-cols-2">
               <div className="space-y-4">
                 <div>
                   <h4 className="font-medium mb-2 text-sm">Description</h4>
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap bg-muted/30 p-3 rounded-lg">
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap bg-muted/30 p-3 rounded-lg break-words">
                     {job.description}
                   </p>
                 </div>
@@ -97,18 +95,18 @@ export function ViewJobDialog({ open, onOpenChange, job, onEdit, onDelete }: Vie
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 text-blue-600 hover:text-blue-700 transition-colors"
+                    className="h-auto p-0 text-blue-600 hover:text-blue-700 transition-colors break-all"
                     onClick={() => window.open(job.url, '_blank')}
                   >
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    View Job Posting
+                    <ExternalLink className="h-4 w-4 mr-2 flex-shrink-0" />
+                    <span className="truncate">View Job Posting</span>
                   </Button>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <h4 className="font-medium mb-2 text-sm">Notes</h4>
-                <div className="text-sm text-muted-foreground whitespace-pre-wrap bg-muted/30 p-3 rounded-lg min-h-[120px]">
+                <div className="text-sm text-muted-foreground whitespace-pre-wrap bg-muted/30 p-3 rounded-lg min-h-[120px] break-words">
                   {job.notes}
                 </div>
               </div>
@@ -119,7 +117,7 @@ export function ViewJobDialog({ open, onOpenChange, job, onEdit, onDelete }: Vie
               {job.description && (
                 <div>
                   <h4 className="font-medium mb-2 text-sm">Description</h4>
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap bg-muted/30 p-3 rounded-lg">
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap bg-muted/30 p-3 rounded-lg break-words">
                     {job.description}
                   </p>
                 </div>
@@ -131,11 +129,11 @@ export function ViewJobDialog({ open, onOpenChange, job, onEdit, onDelete }: Vie
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 text-blue-600 hover:text-blue-700 transition-colors"
+                    className="h-auto p-0 text-blue-600 hover:text-blue-700 transition-colors break-all"
                     onClick={() => window.open(job.url, '_blank')}
                   >
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    View Job Posting
+                    <ExternalLink className="h-4 w-4 mr-2 flex-shrink-0" />
+                    <span className="truncate">View Job Posting</span>
                   </Button>
                 </div>
               )}
@@ -143,7 +141,7 @@ export function ViewJobDialog({ open, onOpenChange, job, onEdit, onDelete }: Vie
               <div>
                 <h4 className="font-medium mb-2 text-sm">Notes</h4>
                 {job.notes ? (
-                  <div className="text-sm text-muted-foreground whitespace-pre-wrap bg-muted/30 p-3 rounded-lg min-h-[120px]">
+                  <div className="text-sm text-muted-foreground whitespace-pre-wrap bg-muted/30 p-3 rounded-lg min-h-[120px] break-words">
                     {job.notes}
                   </div>
                 ) : (
