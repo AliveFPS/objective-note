@@ -1,6 +1,6 @@
 "use client"
 
-import { Home, Settings, NotebookTabs } from "lucide-react"
+import { Home, Settings, NotebookTabs, FileText } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -28,6 +28,11 @@ const items = [
     title: "Job Lists",
     url: "/job-lists",
     icon: NotebookTabs,
+  },
+  {
+    title: "Resumes",
+    url: "/resumes",
+    icon: FileText,
   },
   {
     title: "Settings",

@@ -93,4 +93,100 @@ ipcMain.handle('save-jobs', async (event, jobs) => {
     console.error('Error saving jobs:', error);
     return { success: false, error: error.message };
   }
+});
+
+// Resume management IPC handlers
+ipcMain.handle('select-resume-folder', async () => {
+  try {
+    const { dialog } = require('electron');
+    const result = await dialog.showOpenDialog({
+      properties: ['openDirectory'],
+      title: 'Select Resume Folder'
+    });
+    
+    if (!result.canceled && result.filePaths.length > 0) {
+      return { success: true, folderPath: result.filePaths[0] };
+    }
+    return { success: false, error: 'No folder selected' };
+  } catch (error) {
+    console.error('Error selecting folder:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('get-resumes', async () => {
+  try {
+    const dataPath = path.join(app.getPath('userData'), 'resumes.json');
+    if (fs.existsSync(dataPath)) {
+      const data = fs.readFileSync(dataPath, 'utf8');
+      return JSON.parse(data);
+    }
+    return { resumes: [], tags: [], selectedFolder: null };
+  } catch (error) {
+    console.error('Error reading resumes:', error);
+    return { resumes: [], tags: [], selectedFolder: null };
+  }
+});
+
+ipcMain.handle('scan-folder-for-resumes', async (event, folderPath) => {
+  try {
+    const supportedExtensions = ['.pdf', '.docx', '.doc', '.txt'];
+    const files = [];
+    
+    if (fs.existsSync(folderPath)) {
+      const items = fs.readdirSync(folderPath);
+      
+      for (const item of items) {
+        const itemPath = path.join(folderPath, item);
+        const stats = fs.statSync(itemPath);
+        
+        if (stats.isFile()) {
+          const ext = path.extname(item).toLowerCase();
+          if (supportedExtensions.includes(ext)) {
+            const fileName = path.basename(item, ext);
+            const fileType = ext.substring(1); // Remove the dot
+            
+            files.push({
+              fileName: item,
+              displayName: fileName.replace(/_/g, ' '),
+              filePath: itemPath,
+              fileType: fileType,
+              size: stats.size,
+              modifiedDate: stats.mtime.toISOString()
+            });
+          }
+        }
+      }
+    }
+    
+    return { success: true, files };
+  } catch (error) {
+    console.error('Error scanning folder:', error);
+    return { success: false, error: error.message, files: [] };
+  }
+});
+
+ipcMain.handle('save-resumes', async (event, data) => {
+  try {
+    const dataPath = path.join(app.getPath('userData'), 'resumes.json');
+    fs.writeFileSync(dataPath, JSON.stringify(data, null, 2));
+    return { success: true };
+  } catch (error) {
+    console.error('Error saving resumes:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('validate-folder-access', async (event, folderPath) => {
+  try {
+    if (fs.existsSync(folderPath)) {
+      // Try to read the directory to ensure we have access
+      fs.readdirSync(folderPath);
+      return { success: true };
+    }
+    return { success: false, error: 'Folder not found' };
+  } catch (error) {
+    console.error('Error validating folder access:', error);
+    return { success: false, error: error.message };
+  }
 }); 
