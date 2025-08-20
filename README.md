@@ -8,9 +8,9 @@ I've worked on a project similar to this but in a SaaS format. I realize that pa
 By making this an application local on your computer rather than a webapp, you will own your data and have all access to it. I hope in creating this I provide a better tool to organize the jobs you've applied to, and provide an easy place to write your notes for reading.
 
 ## Features (Planned)
-- [ ] List jobs
-- [ ] Add status to jobs
-- [ ] Add Notes to jobs 
-- [ ] PDF export functionality 
+- [X] List jobs
+- [X] Add status to jobs
+- [X] Add Notes to jobs 
+- [ ] Resume Upload Feature
 - [ ] Filter and search feature
 - [ ] More to come
