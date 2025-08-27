@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button"
 import { useResumeStorage } from "@/hooks/use-resume-storage"
 import { ResumeCard } from "@/components/resume-card"
 import { AddResumeDialog } from "@/components/add-resume-dialog"
+import { EditResumeDialog } from "@/components/edit-resume-dialog"
 import { FileReviewDialog } from "@/components/file-review-dialog"
 import { FolderManagementDialog } from "@/components/folder-management-dialog"
+import { Resume } from "@/types/resume"
 
 export function ResumeList() {
   const { 
@@ -18,10 +20,14 @@ export function ResumeList() {
     selectFolder, 
     clearFolder,
     validateFolder,
+    updateResume,
+    deleteResume,
     refresh 
   } = useResumeStorage()
   
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [editingResume, setEditingResume] = useState<Resume | null>(null)
   const [isFileReviewDialogOpen, setIsFileReviewDialogOpen] = useState(false)
   const [isFolderManagementDialogOpen, setIsFolderManagementDialogOpen] = useState(false)
 
@@ -46,6 +52,21 @@ export function ResumeList() {
         // You could show a toast or modal here to prompt folder reselection
       }
     }
+  }
+
+  const handleEditResume = (resume: Resume) => {
+    setEditingResume(resume)
+    setIsEditDialogOpen(true)
+  }
+
+  const handleDeleteResume = async (resume: Resume) => {
+    if (confirm(`Are you sure you want to delete "${resume.title}"? This action cannot be undone.`)) {
+      await deleteResume(resume.id)
+    }
+  }
+
+  const handleUpdateResume = async (resumeId: string, updates: Partial<Resume>) => {
+    await updateResume(resumeId, updates)
   }
 
   // Validate folder access on mount
@@ -146,6 +167,8 @@ export function ResumeList() {
                   key={resume.id} 
                   resume={resume}
                   animationDelay={index * 100}
+                  onEdit={() => handleEditResume(resume)}
+                  onDelete={() => handleDeleteResume(resume)}
                 />
               ))}
             </div>
@@ -157,6 +180,14 @@ export function ResumeList() {
       <AddResumeDialog
         open={isAddDialogOpen}
         onOpenChange={setIsAddDialogOpen}
+      />
+      
+      {/* Edit Resume Dialog */}
+      <EditResumeDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        onUpdateResume={handleUpdateResume}
+        resume={editingResume}
       />
       
       {/* File Review Dialog */}
