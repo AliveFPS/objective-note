@@ -21,6 +21,7 @@ interface FileReviewDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   folderPath: string
+  onImportComplete?: () => void
 }
 
 interface DetectedFile {
@@ -32,8 +33,8 @@ interface DetectedFile {
   modifiedDate: string
 }
 
-export function FileReviewDialog({ open, onOpenChange, folderPath }: FileReviewDialogProps) {
-  const { scanFolder, addResume } = useResumeStorage()
+export function FileReviewDialog({ open, onOpenChange, folderPath, onImportComplete }: FileReviewDialogProps) {
+  const { scanFolder, addMultipleResumes } = useResumeStorage()
   const [detectedFiles, setDetectedFiles] = useState<DetectedFile[]>([])
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set())
   const [isScanning, setIsScanning] = useState(false)
@@ -85,21 +86,24 @@ export function FileReviewDialog({ open, onOpenChange, folderPath }: FileReviewD
     try {
       const selectedFileList = detectedFiles.filter(f => selectedFiles.has(f.filePath))
       
-      for (const file of selectedFileList) {
-        const success = await addResume({
-          title: file.displayName,
-          fileName: file.fileName,
-          filePath: file.filePath,
-          fileType: file.fileType as any,
-          tagId: null,
-        })
-        
-        if (!success) {
-          throw new Error(`Failed to import ${file.displayName}`)
-        }
+      // Import all files at once by building the complete list
+      const newResumes = selectedFileList.map(file => ({
+        title: file.displayName,
+        fileName: file.fileName,
+        filePath: file.filePath,
+        fileType: file.fileType as any,
+        tagId: null,
+      }))
+      
+      // Add all resumes in a single operation
+      const success = await addMultipleResumes(newResumes)
+      if (!success) {
+        throw new Error('Failed to import some files')
       }
       
+      // Close dialog and trigger refresh
       onOpenChange(false)
+      onImportComplete?.()
     } catch (error) {
       console.error('Error importing files:', error)
       // You could show a toast notification here

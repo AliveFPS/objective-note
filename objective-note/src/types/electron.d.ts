@@ -20,6 +20,7 @@ export interface ElectronAPI {
     }>;
     error?: string;
   }>
+  openFile: (filePath: string) => Promise<{ success: boolean; error?: string }>
 }
 
 declare global {

@@ -122,14 +122,27 @@ export function ResumeCard({
                 variant="ghost" 
                 size="sm" 
                 className="h-8 w-8 p-0 hover:bg-muted"
-                onClick={(e) => {
+                onClick={async (e) => {
                   e.stopPropagation()
                   // Open file in default application
-                  if (typeof window !== 'undefined' && window.electronAPI) {
-                    // In Electron, we could open the file
-                    console.log('Opening file:', resume.filePath)
+                  if (typeof window !== 'undefined' && window.electronAPI && window.electronAPI.openFile) {
+                    try {
+                      const result = await window.electronAPI.openFile(resume.filePath)
+                      if (!result.success) {
+                        console.error('Failed to open file:', result.error)
+                        // You could show a toast notification here
+                      }
+                    } catch (error) {
+                      console.error('Error opening file:', error)
+                    }
+                  } else {
+                    // Fallback for web environment or when Electron API is not available
+                    console.log('File opening not available in web mode:', resume.filePath)
+                    // Show a user-friendly message
+                    alert('File opening is only available in the desktop application. Please use the Electron app to open files.')
                   }
                 }}
+                title="Open file"
               >
                 <ExternalLink className="h-4 w-4" />
               </Button>

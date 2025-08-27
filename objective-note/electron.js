@@ -189,4 +189,21 @@ ipcMain.handle('validate-folder-access', async (event, folderPath) => {
     console.error('Error validating folder access:', error);
     return { success: false, error: error.message };
   }
+});
+
+// Open file in default application
+ipcMain.handle('open-file', async (event, filePath) => {
+  try {
+    const { shell } = require('electron');
+    
+    if (fs.existsSync(filePath)) {
+      await shell.openPath(filePath);
+      return { success: true };
+    } else {
+      return { success: false, error: 'File not found' };
+    }
+  } catch (error) {
+    console.error('Error opening file:', error);
+    return { success: false, error: error.message };
+  }
 }); 

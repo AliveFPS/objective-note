@@ -10,4 +10,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
   saveResumes: (data) => ipcRenderer.invoke('save-resumes', data),
   validateFolderAccess: (folderPath) => ipcRenderer.invoke('validate-folder-access', folderPath),
   scanFolderForResumes: (folderPath) => ipcRenderer.invoke('scan-folder-for-resumes', folderPath),
+  openFile: (filePath) => ipcRenderer.invoke('open-file', filePath),
 }) 

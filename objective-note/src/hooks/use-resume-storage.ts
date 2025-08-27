@@ -204,6 +204,20 @@ export function useResumeStorage() {
     return success
   }, [resumes, tags, selectedFolder, saveResumes])
 
+  // Add multiple resumes at once
+  const addMultipleResumes = useCallback(async (resumeList: Omit<Resume, 'id' | 'createdAt' | 'updatedAt'>[]) => {
+    const newResumes: Resume[] = resumeList.map(resume => ({
+      ...resume,
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }))
+    
+    // Preserve the current selectedFolder when adding resumes
+    const success = await saveResumes([...newResumes, ...resumes], tags, selectedFolder)
+    return success
+  }, [resumes, tags, selectedFolder, saveResumes])
+
   // Update an existing resume
   const updateResume = useCallback(async (resumeId: string, updates: Partial<Resume>) => {
     const updatedResumes = resumes.map(resume => 
@@ -291,6 +305,7 @@ export function useResumeStorage() {
     scanFolder,
     validateFolder,
     addResume,
+    addMultipleResumes,
     updateResume,
     deleteResume,
     addTag,

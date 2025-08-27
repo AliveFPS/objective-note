@@ -196,6 +196,7 @@ export function ResumeList() {
           open={isFileReviewDialogOpen}
           onOpenChange={setIsFileReviewDialogOpen}
           folderPath={selectedFolder}
+          onImportComplete={refresh}
         />
       )}
       
