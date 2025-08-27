@@ -38,7 +38,7 @@ export function JobCard({ job, onDelete, onEdit, onClick, animationDelay = 0 }: 
     >
       <CardHeader className="pb-3">
         <div className="space-y-2">
-          <CardTitle className="text-lg font-semibold truncate group-hover:text-primary transition-colors">
+          <CardTitle className="text-lg font-semibold break-words leading-tight group-hover:text-primary transition-colors">
             {job.title}
           </CardTitle>
           {job.description && (

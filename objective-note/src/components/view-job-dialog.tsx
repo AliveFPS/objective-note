@@ -41,7 +41,7 @@ export function ViewJobDialog({ open, onOpenChange, job, onEdit, onDelete }: Vie
         <DialogHeader className="pb-8 pt-2">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex-1 min-w-0">
-              <DialogTitle className="text-2xl font-bold mb-2 truncate">{job.title}</DialogTitle>
+              <DialogTitle className="text-2xl font-bold mb-2 break-words leading-tight">{job.title}</DialogTitle>
               <DialogDescription className="flex flex-wrap items-center gap-4 text-sm">
                 <span>Added {formattedCreatedDate}</span>
                 {formattedCreatedDate !== formattedUpdatedDate && (

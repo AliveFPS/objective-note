@@ -11,6 +11,6 @@ By making this an application local on your computer rather than a webapp, you w
 - [X] List jobs
 - [X] Add status to jobs
 - [X] Add Notes to jobs 
-- [ ] Resume Upload Feature 
+- [ ] Resume Upload Feature
 - [ ] Filter and search feature
 - [ ] More to come
