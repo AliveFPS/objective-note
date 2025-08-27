@@ -189,7 +189,7 @@ export function FileReviewDialog({ open, onOpenChange, folderPath }: FileReviewD
                         <div className="flex-1 min-w-0">
                           <Label 
                             htmlFor={file.filePath}
-                            className="text-sm font-medium cursor-pointer truncate block"
+                            className="text-sm font-medium cursor-pointer break-words leading-tight"
                           >
                             {file.displayName}
                           </Label>

@@ -56,7 +56,7 @@ export function ResumeCard({
     >
       <CardHeader className="pb-3">
         <div className="space-y-2">
-          <CardTitle className="text-lg font-semibold truncate group-hover:text-primary transition-colors">
+          <CardTitle className="text-lg font-semibold break-words leading-tight group-hover:text-primary transition-colors">
             {resume.title}
           </CardTitle>
           {tag && (
