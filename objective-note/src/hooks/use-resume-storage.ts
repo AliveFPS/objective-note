@@ -237,6 +237,13 @@ export function useResumeStorage() {
     return success
   }, [resumes, tags, selectedFolder, saveResumes])
 
+  // Delete multiple resumes at once
+  const deleteMultipleResumes = useCallback(async (resumeIds: string[]) => {
+    const updatedResumes = resumes.filter(resume => !resumeIds.includes(resume.id))
+    const success = await saveResumes(updatedResumes, tags, selectedFolder)
+    return success
+  }, [resumes, tags, selectedFolder, saveResumes])
+
   // Add a new tag
   const addTag = useCallback(async (name: string, color: string) => {
     const newTag: Tag = {
@@ -308,6 +315,7 @@ export function useResumeStorage() {
     addMultipleResumes,
     updateResume,
     deleteResume,
+    deleteMultipleResumes,
     addTag,
     deleteTag,
     getAvailableColors,

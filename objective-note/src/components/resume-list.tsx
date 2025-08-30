@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { FolderOpen, Plus, RefreshCw, Settings, Trash2 } from "lucide-react"
+import { FolderOpen, Plus, RefreshCw, Settings, Trash2, FolderPlus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useResumeStorage } from "@/hooks/use-resume-storage"
 import { ResumeCard } from "@/components/resume-card"
@@ -69,6 +69,10 @@ export function ResumeList() {
     await updateResume(resumeId, updates)
   }
 
+  const handleManageFiles = () => {
+    setIsFileReviewDialogOpen(true)
+  }
+
   // Validate folder access on mount
   useEffect(() => {
     if (selectedFolder) {
@@ -131,6 +135,15 @@ export function ResumeList() {
                 title="Manage Folder"
               >
                 <Settings className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={handleManageFiles}
+                disabled={isLoading}
+                className="transition-all duration-200 hover:scale-105"
+              >
+                <FolderPlus className="mr-2 h-4 w-4" />
+                Manage Files
               </Button>
               <Button 
                 onClick={() => setIsAddDialogOpen(true)} 
@@ -197,6 +210,7 @@ export function ResumeList() {
           onOpenChange={setIsFileReviewDialogOpen}
           folderPath={selectedFolder}
           onImportComplete={refresh}
+          existingResumes={resumes.map(r => ({ filePath: r.filePath, id: r.id }))}
         />
       )}
       

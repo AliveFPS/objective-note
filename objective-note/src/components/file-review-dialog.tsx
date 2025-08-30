@@ -22,6 +22,7 @@ interface FileReviewDialogProps {
   onOpenChange: (open: boolean) => void
   folderPath: string
   onImportComplete?: () => void
+  existingResumes?: Array<{ filePath: string; id: string }>
 }
 
 interface DetectedFile {
@@ -33,12 +34,12 @@ interface DetectedFile {
   modifiedDate: string
 }
 
-export function FileReviewDialog({ open, onOpenChange, folderPath, onImportComplete }: FileReviewDialogProps) {
-  const { scanFolder, addMultipleResumes } = useResumeStorage()
+export function FileReviewDialog({ open, onOpenChange, folderPath, onImportComplete, existingResumes = [] }: FileReviewDialogProps) {
+  const { scanFolder, addMultipleResumes, deleteMultipleResumes } = useResumeStorage()
   const [detectedFiles, setDetectedFiles] = useState<DetectedFile[]>([])
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set())
   const [isScanning, setIsScanning] = useState(false)
-  const [isImporting, setIsImporting] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
 
   // Scan folder when dialog opens
   useEffect(() => {
@@ -53,8 +54,13 @@ export function FileReviewDialog({ open, onOpenChange, folderPath, onImportCompl
       const result = await scanFolder(folderPath)
       if (result.success) {
         setDetectedFiles(result.files)
-        // Pre-select all files
-        setSelectedFiles(new Set(result.files.map(f => f.filePath)))
+        
+        // Create a set of existing resume file paths for quick lookup
+        const existingFilePaths = new Set(existingResumes.map(r => r.filePath))
+        
+        // Pre-select files that ARE already imported
+        const importedFiles = result.files.filter(f => existingFilePaths.has(f.filePath))
+        setSelectedFiles(new Set(importedFiles.map(f => f.filePath)))
       }
     } catch (error) {
       console.error('Error scanning folder:', error)
@@ -73,42 +79,57 @@ export function FileReviewDialog({ open, onOpenChange, folderPath, onImportCompl
     setSelectedFiles(newSelected)
   }
 
-  const handleSelectAll = () => {
-    setSelectedFiles(new Set(detectedFiles.map(f => f.filePath)))
-  }
 
-  const handleSelectNone = () => {
-    setSelectedFiles(new Set())
-  }
 
-  const handleImport = async () => {
-    setIsImporting(true)
+  const handleSave = async () => {
+    setIsSaving(true)
     try {
       const selectedFileList = detectedFiles.filter(f => selectedFiles.has(f.filePath))
+      const existingFilePaths = new Set(existingResumes.map(r => r.filePath))
       
-      // Import all files at once by building the complete list
-      const newResumes = selectedFileList.map(file => ({
-        title: file.displayName,
-        fileName: file.fileName,
-        filePath: file.filePath,
-        fileType: file.fileType as any,
-        tagId: null,
-      }))
+      // Separate new files to import and existing files to potentially remove
+      const newFiles = selectedFileList.filter(f => !existingFilePaths.has(f.filePath))
       
-      // Add all resumes in a single operation
-      const success = await addMultipleResumes(newResumes)
-      if (!success) {
-        throw new Error('Failed to import some files')
+      // Import new files
+      if (newFiles.length > 0) {
+        const newResumes = newFiles.map(file => ({
+          title: file.displayName,
+          fileName: file.fileName,
+          filePath: file.filePath,
+          fileType: file.fileType as any,
+          tagId: null,
+        }))
+        
+        const success = await addMultipleResumes(newResumes)
+        if (!success) {
+          throw new Error('Failed to import some files')
+        }
+      }
+      
+      // Handle unselected existing files (remove them)
+      const unselectedExistingFiles = detectedFiles.filter(f => 
+        existingFilePaths.has(f.filePath) && !selectedFiles.has(f.filePath)
+      )
+      
+      if (unselectedExistingFiles.length > 0) {
+        const resumeIdsToDelete = unselectedExistingFiles
+          .map(file => existingResumes.find(r => r.filePath === file.filePath)?.id)
+          .filter((id): id is string => id !== undefined)
+        
+        const success = await deleteMultipleResumes(resumeIdsToDelete)
+        if (!success) {
+          throw new Error('Failed to remove some files')
+        }
       }
       
       // Close dialog and trigger refresh
       onOpenChange(false)
       onImportComplete?.()
     } catch (error) {
-      console.error('Error importing files:', error)
+      console.error('Error saving changes:', error)
       // You could show a toast notification here
     } finally {
-      setIsImporting(false)
+      setIsSaving(false)
     }
   }
 
@@ -161,19 +182,9 @@ export function FileReviewDialog({ open, onOpenChange, folderPath, onImportCompl
             </div>
           ) : (
             <>
-              {/* Selection Controls */}
-              <div className="flex justify-between items-center">
-                <div className="text-sm text-muted-foreground">
-                  {selectedFiles.size} of {detectedFiles.length} files selected
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={handleSelectAll}>
-                    Select All
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={handleSelectNone}>
-                    Select None
-                  </Button>
-                </div>
+              {/* Selection Info */}
+              <div className="text-sm text-muted-foreground">
+                {selectedFiles.size} of {detectedFiles.length} files selected
               </div>
 
               {/* File List */}
@@ -219,23 +230,23 @@ export function FileReviewDialog({ open, onOpenChange, folderPath, onImportCompl
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
-            disabled={isImporting}
+            disabled={isSaving}
           >
             Cancel
           </Button>
           <Button
-            onClick={handleImport}
-            disabled={selectedFiles.size === 0 || isImporting}
+            onClick={handleSave}
+            disabled={isSaving}
           >
-            {isImporting ? (
+            {isSaving ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Importing...
+                Saving...
               </>
             ) : (
               <>
                 <Check className="mr-2 h-4 w-4" />
-                Import Selected ({selectedFiles.size})
+                Save Changes
               </>
             )}
           </Button>
