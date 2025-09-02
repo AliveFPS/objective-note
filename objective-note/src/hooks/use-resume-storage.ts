@@ -274,6 +274,69 @@ export function useResumeStorage() {
     return TAG_COLORS.filter(color => !usedColors.includes(color))
   }, [tags])
 
+  // Check for orphaned resumes (files that exist in app but not in folder)
+  const checkForOrphanedResumes = useCallback(async () => {
+    if (!selectedFolder || !isElectron()) return
+    
+    try {
+      // Get all files currently in the folder
+      const scanResult = await scanFolder(selectedFolder)
+      if (!scanResult.success) return
+      
+      const folderFiles = new Set(scanResult.files.map(f => f.filePath))
+      
+      // Find resumes that no longer exist in the folder
+      const orphanedResumes = resumes.filter(resume => !folderFiles.has(resume.filePath))
+      
+      if (orphanedResumes.length > 0) {
+        // Remove orphaned resumes from the list
+        const validResumes = resumes.filter(resume => folderFiles.has(resume.filePath))
+        
+        // Update both the storage and the local state
+        const success = await saveResumes(validResumes, tags, selectedFolder)
+        if (success) {
+          setResumes(validResumes)
+          console.log(`Removed ${orphanedResumes.length} orphaned resumes`)
+        }
+      }
+    } catch (error) {
+      console.error('Error checking for orphaned resumes:', error)
+    }
+  }, [selectedFolder, resumes, tags, scanFolder, saveResumes])
+
+  // Force cleanup of orphaned resumes (more aggressive)
+  const forceCleanup = useCallback(async () => {
+    if (!selectedFolder || !isElectron()) return
+    
+    try {
+      // Get all files currently in the folder
+      const scanResult = await scanFolder(selectedFolder)
+      if (!scanResult.success) return
+      
+      const folderFiles = new Set(scanResult.files.map(f => f.filePath))
+      
+      // Find resumes that no longer exist in the folder
+      const orphanedResumes = resumes.filter(resume => !folderFiles.has(resume.filePath))
+      
+      if (orphanedResumes.length > 0) {
+        // Remove orphaned resumes from the list
+        const validResumes = resumes.filter(resume => folderFiles.has(resume.filePath))
+        
+        // Update both the storage and the local state
+        const success = await saveResumes(validResumes, tags, selectedFolder)
+        if (success) {
+          setResumes(validResumes)
+          console.log(`Force cleanup: Removed ${orphanedResumes.length} orphaned resumes`)
+          return true
+        }
+      }
+      return false
+    } catch (error) {
+      console.error('Error during force cleanup:', error)
+      return false
+    }
+  }, [selectedFolder, resumes, tags, scanFolder, saveResumes])
+
   // Refresh data from storage
   const refresh = useCallback(async () => {
     try {
@@ -290,16 +353,35 @@ export function useResumeStorage() {
         data = fallbackStorage.getResumes()
       }
       
+      // Set the initial data
       setResumes(data.resumes)
       setTags(data.tags)
       setSelectedFolder(data.selectedFolder)
+      
+      // Check for orphaned resumes and update storage if needed
+      if (data.selectedFolder && data.resumes.length > 0) {
+        const scanResult = await scanFolder(data.selectedFolder)
+        if (scanResult.success) {
+          const folderFiles = new Set(scanResult.files.map(f => f.filePath))
+          const validResumes = data.resumes.filter(resume => folderFiles.has(resume.filePath))
+          const orphanedCount = data.resumes.length - validResumes.length
+          
+          if (orphanedCount > 0) {
+            // Update storage with only valid resumes
+            await saveResumes(validResumes, data.tags, data.selectedFolder)
+            // Update local state
+            setResumes(validResumes)
+            console.log(`Removed ${orphanedCount} orphaned resumes during refresh`)
+          }
+        }
+      }
     } catch (err) {
       console.error('Error refreshing data:', err)
       setError('Failed to refresh data')
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [scanFolder, saveResumes])
 
   return {
     resumes,
@@ -319,6 +401,8 @@ export function useResumeStorage() {
     addTag,
     deleteTag,
     getAvailableColors,
-    refresh
+    refresh,
+    checkForOrphanedResumes,
+    forceCleanup
   }
 }

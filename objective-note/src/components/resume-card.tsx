@@ -10,7 +10,6 @@ interface ResumeCardProps {
   resume: Resume
   tag?: Tag | null
   onEdit?: () => void
-  onDelete?: () => void
   onView?: () => void
   animationDelay?: number
 }
@@ -19,7 +18,6 @@ export function ResumeCard({
   resume, 
   tag, 
   onEdit, 
-  onDelete, 
   onView,
   animationDelay = 0 
 }: ResumeCardProps) {
@@ -107,17 +105,7 @@ export function ResumeCard({
               >
                 <Edit className="h-4 w-4" />
               </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onDelete?.()
-                }}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+
               <Button 
                 variant="ghost" 
                 size="sm" 

@@ -160,9 +160,9 @@ export function FileReviewDialog({ open, onOpenChange, folderPath, onImportCompl
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Review Detected Files</DialogTitle>
+          <DialogTitle>Manage Resume Collection</DialogTitle>
           <DialogDescription>
-            Select which files you'd like to add to your resume collection.
+            Choose which files from your folder appear in your resume collection. Checked files will be visible, unchecked files will be hidden.
           </DialogDescription>
         </DialogHeader>
         

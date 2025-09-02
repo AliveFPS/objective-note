@@ -21,6 +21,18 @@ export interface ElectronAPI {
     error?: string;
   }>
   openFile: (filePath: string) => Promise<{ success: boolean; error?: string }>
+  selectFile: (options: { title?: string; filters?: Array<{ name: string; extensions: string[] }> }) => Promise<{ 
+    success: boolean; 
+    filePath?: string; 
+    error?: string 
+  }>
+  checkFileExists: (filePath: string) => Promise<boolean>
+  copyFileToFolder: (sourceFilePath: string, targetFolder: string) => Promise<{ 
+    success: boolean; 
+    targetPath?: string; 
+    fileName?: string; 
+    error?: string 
+  }>
 }
 
 declare global {
