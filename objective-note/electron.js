@@ -206,4 +206,63 @@ ipcMain.handle('open-file', async (event, filePath) => {
     console.error('Error opening file:', error);
     return { success: false, error: error.message };
   }
+});
+
+// Select a single file
+ipcMain.handle('select-file', async (event, options) => {
+  try {
+    const { dialog } = require('electron');
+    const result = await dialog.showOpenDialog({
+      properties: ['openFile'],
+      title: options.title || 'Select File',
+      filters: options.filters || []
+    });
+    
+    if (!result.canceled && result.filePaths.length > 0) {
+      return { success: true, filePath: result.filePaths[0] };
+    }
+    return { success: false, error: 'No file selected' };
+  } catch (error) {
+    console.error('Error selecting file:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+// Check if a file exists
+ipcMain.handle('check-file-exists', async (event, filePath) => {
+  try {
+    return fs.existsSync(filePath);
+  } catch (error) {
+    console.error('Error checking file existence:', error);
+    return false;
+  }
+});
+
+// Copy file to resume folder
+ipcMain.handle('copy-file-to-folder', async (event, { sourceFilePath, targetFolder }) => {
+  try {
+    if (!fs.existsSync(sourceFilePath)) {
+      return { success: false, error: 'Source file not found' };
+    }
+    
+    if (!fs.existsSync(targetFolder)) {
+      return { success: false, error: 'Target folder not found' };
+    }
+    
+    // Get file info
+    const fileName = path.basename(sourceFilePath);
+    const targetPath = path.join(targetFolder, fileName);
+    
+    // Simple copy - no automatic renaming
+    fs.copyFileSync(sourceFilePath, targetPath);
+    
+    return { 
+      success: true, 
+      targetPath: targetPath,
+      fileName: fileName
+    };
+  } catch (error) {
+    console.error('Error copying file:', error);
+    return { success: false, error: error.message };
+  }
 }); 

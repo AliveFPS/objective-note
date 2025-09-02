@@ -22,7 +22,7 @@ export function ResumeList() {
     validateFolder,
     updateResume,
     deleteResume,
-    refresh 
+    refresh
   } = useResumeStorage()
   
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
@@ -141,9 +141,10 @@ export function ResumeList() {
                 onClick={handleManageFiles}
                 disabled={isLoading}
                 className="transition-all duration-200 hover:scale-105"
+                title="Choose which files appear in your resume collection"
               >
                 <FolderPlus className="mr-2 h-4 w-4" />
-                Manage Files
+                Manage Collection
               </Button>
               <Button 
                 onClick={() => setIsAddDialogOpen(true)} 
@@ -181,7 +182,6 @@ export function ResumeList() {
                   resume={resume}
                   animationDelay={index * 100}
                   onEdit={() => handleEditResume(resume)}
-                  onDelete={() => handleDeleteResume(resume)}
                 />
               ))}
             </div>
@@ -193,6 +193,8 @@ export function ResumeList() {
       <AddResumeDialog
         open={isAddDialogOpen}
         onOpenChange={setIsAddDialogOpen}
+        selectedFolder={selectedFolder}
+        onResumeAdded={refresh}
       />
       
       {/* Edit Resume Dialog */}
